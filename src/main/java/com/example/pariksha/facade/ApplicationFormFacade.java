@@ -72,7 +72,7 @@ public class ApplicationFormFacade {
     }
 
     public boolean saveApplicationForm(ApplicationFormNewDto applicationFormNewDto){
-
+                return false;
     }
 
 }

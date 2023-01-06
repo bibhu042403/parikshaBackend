@@ -8,6 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 @RequestMapping(path= "/form")
 public class FormController {
@@ -33,5 +36,22 @@ public class FormController {
         else
             return new ResponseEntity<>("Lead failed to save", HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @CrossOrigin
+    @GetMapping(path = "/getFiveLastData")
+    public List<ApplicationForm> getFiveLastData(){
+        List<ApplicationForm> list = applicationFormFacade.getFiveLastData();
+        System.out.println(list);
+        return list;
+    }
+
+    @CrossOrigin
+    @GetMapping(path = "/getFiveLatestData")
+    public List<ApplicationForm> getFiveLatestData(){
+        List<ApplicationForm> list = applicationFormFacade.getFiveLastData();
+        System.out.println(list);
+        return list;
+    }
+
 
 }

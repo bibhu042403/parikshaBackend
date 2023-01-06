@@ -5,6 +5,9 @@ import com.example.pariksha.model.*;
 import com.example.pariksha.service.ApplicationFormService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -77,12 +80,7 @@ public class ApplicationFormServiceImpl implements ApplicationFormService {
     public boolean saveApplicationFormDate(ApplicationFormDate applicationFormDate) {
         try{
             ApplicationFormDate saveApplicationFormDate = applicationFormDateRepository.save(applicationFormDate);
-            if(saveApplicationFormDate!= null){
-                return true;
-            }
-            else {
-                return false;
-            }
+            return saveApplicationFormDate != null;
         }
         catch(Exception e){
             log.info("Exception while saving ");
@@ -94,12 +92,7 @@ public class ApplicationFormServiceImpl implements ApplicationFormService {
     public boolean saveApplicationFeeDetails(ApplicationFeeDetails applicationFeeDetails) {
         try{
             ApplicationFeeDetails saveApplicationFeeDetails = applicationFeeDetailsRepository.save(applicationFeeDetails);
-            if(saveApplicationFeeDetails!= null){
-                return true;
-            }
-            else {
-                return false;
-            }
+            return saveApplicationFeeDetails != null;
         }
         catch(Exception e){
             log.info("Exception while saving ");
@@ -111,12 +104,7 @@ public class ApplicationFormServiceImpl implements ApplicationFormService {
     public boolean saveApplicationAgeLimit(ApplicationAgeLimit applicationAgeLimit) {
         try{
             ApplicationAgeLimit saveApplicationAgeLimit = applicationAgeLimitRepository.save(applicationAgeLimit);
-        if(saveApplicationAgeLimit!= null){
-        return true;
-        }
-        else {
-        return false;
-        }
+            return saveApplicationAgeLimit != null;
         }
         catch(Exception e){
         log.info("Exception while saving ");
@@ -128,12 +116,7 @@ public class ApplicationFormServiceImpl implements ApplicationFormService {
     public boolean saveApplyDetails(ApplyDetails applyDetails) {
         try{
             ApplyDetails saveApplyDetails = applyDetailsRepository.save(applyDetails);
-        if(saveApplyDetails!= null){
-        return true;
-        }
-        else {
-        return false;
-        }
+            return saveApplyDetails != null;
         }
         catch(Exception e){
         log.info("Exception while saving ");
@@ -145,12 +128,7 @@ public class ApplicationFormServiceImpl implements ApplicationFormService {
     public boolean saveExamDetails(ExamDetails examDetails) {
         try{
             ExamDetails saveExamDetails = examDetailsRepository.save(examDetails);
-        if(saveExamDetails!= null){
-        return true;
-        }
-        else {
-        return false;
-        }
+            return saveExamDetails != null;
         }
         catch(Exception e){
         log.info("Exception while saving ");
@@ -162,12 +140,7 @@ public class ApplicationFormServiceImpl implements ApplicationFormService {
     public boolean saveQualificationDetails(QualificationDetails qualificationDetails) {
         try{
             QualificationDetails saveQualificationDetails = qualificationDetailsRepository.save(qualificationDetails);
-        if(saveQualificationDetails!= null){
-        return true;
-        }
-        else {
-        return false;
-        }
+            return saveQualificationDetails != null;
         }
         catch(Exception e){
         log.info("Exception while saving ");
@@ -179,12 +152,7 @@ public class ApplicationFormServiceImpl implements ApplicationFormService {
     public boolean saveVacancyCategoryWise(VacancyCategoryWise vacancyCategoryWise) {
         try{
             VacancyCategoryWise saveVacancyCategoryWise = vacancyCategoryWiseRepository.save(vacancyCategoryWise);
-        if(saveVacancyCategoryWise!= null){
-        return true;
-        }
-        else {
-        return false;
-        }
+            return saveVacancyCategoryWise != null;
         }
         catch(Exception e){
         log.info("Exception while saving ");
@@ -197,12 +165,7 @@ public class ApplicationFormServiceImpl implements ApplicationFormService {
     public boolean saveVacancyPostWise(VacancyPostWise vacancyPostWise){
         try{
             VacancyPostWise saveVacancyPostWise = vacancyPostWiseRepository.save(vacancyPostWise);
-            if(saveVacancyPostWise!= null){
-                return true;
-            }
-            else {
-                return false;
-            }
+            return saveVacancyPostWise != null;
         }
         catch(Exception e){
             log.info("Exception while saving ");
@@ -213,13 +176,8 @@ public class ApplicationFormServiceImpl implements ApplicationFormService {
     @Override
     public boolean saveApplicationForm(ApplicationForm applicationForm) {
         try{
-            ApplicationForm saveApplicationForm= applicationFormRepository.save(applicationForm);
-            if(saveApplicationForm!= null){
-                return true;
-            }
-            else {
-                return false;
-            }
+            ApplicationForm saveApplicationForm = applicationFormRepository.save(applicationForm);
+            return saveApplicationForm != null;
         }
         catch(Exception e){
             log.info("Exception while saving ");
@@ -230,5 +188,17 @@ public class ApplicationFormServiceImpl implements ApplicationFormService {
     @Override
     public List<ApplicationForm> getLastFiveApplication(Date date) {
         return null;
+    }
+
+    @Override
+    public Optional<List<ApplicationForm>> getAllLimited(int LIMIT) {
+        Page<ApplicationForm> page = applicationFormRepository.findAll(PageRequest.of(0,LIMIT, Sort.by(Sort.Order.asc("lastDate"))));
+        return Optional.of(page.getContent());
+    }
+
+    @Override
+    public Optional<List<ApplicationForm>> getAllLatestData(int LIMIT) {
+        Page<ApplicationForm> page = applicationFormRepository.findAll(PageRequest.of(0,LIMIT, Sort.by(Sort.Order.asc("dateCreated"))));
+        return Optional.of(page.getContent());
     }
 }

@@ -26,4 +26,8 @@ public interface ApplicationFormService {
     boolean saveApplicationForm(ApplicationForm applicationForm);
 
     List<ApplicationForm> getLastFiveApplication(Date date);
+
+    Optional<List<ApplicationForm>> getAllLimited(int LIMIT);
+
+    Optional<List<ApplicationForm>> getAllLatestData(int LIMIT);
 }

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
+import java.util.List;
 
 @Component
 public class ApplicationFormFacade {
@@ -74,5 +75,18 @@ public class ApplicationFormFacade {
     public boolean saveApplicationForm(ApplicationFormNewDto applicationFormNewDto){
                 return false;
     }
+
+    public List<ApplicationForm> getFiveLastData(){
+        int lastData = 5;
+        List<ApplicationForm> formDetails = applicationFormService.getAllLimited(lastData).get();
+        return formDetails;
+    }
+
+    public List<ApplicationForm> getFiveLatestData(){
+        int topData = 5;
+        List<ApplicationForm> formDetails = applicationFormService.getAllLatestData(topData).get();
+        return formDetails;
+    }
+
 
 }

@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -200,5 +201,15 @@ public class ApplicationFormServiceImpl implements ApplicationFormService {
     public Optional<List<ApplicationForm>> getAllLatestData(int LIMIT) {
         Page<ApplicationForm> page = applicationFormRepository.findAll(PageRequest.of(0,LIMIT, Sort.by(Sort.Order.asc("dateCreated"))));
         return Optional.of(page.getContent());
+    }
+
+    @Override
+    public void deleteExpiredForm(Date date) {
+        try{
+            applicationFormRepository.deleteByLastDateLessThan(date);
+        }
+        catch(Exception e){
+            System.out.println("Exception occurred while deleting");
+        }
     }
 }

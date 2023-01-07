@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.Optional;
 
 @Repository
@@ -16,4 +17,6 @@ public interface ApplicationFormRepository extends JpaRepository<ApplicationForm
     Optional<ApplicationForm> findApplicationFormByExamId(String examName);
 
     Page<ApplicationForm> findAll(Pageable pageable);
+
+    void deleteByLastDateLessThan(Date date);
 }

@@ -8,7 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -41,7 +43,6 @@ public class FormController {
     @GetMapping(path = "/getFiveLastData")
     public List<ApplicationForm> getFiveLastData(){
         List<ApplicationForm> list = applicationFormFacade.getFiveLastData();
-        System.out.println(list);
         return list;
     }
 
@@ -49,8 +50,19 @@ public class FormController {
     @GetMapping(path = "/getFiveLatestData")
     public List<ApplicationForm> getFiveLatestData(){
         List<ApplicationForm> list = applicationFormFacade.getFiveLastData();
-        System.out.println(list);
         return list;
+    }
+
+    @CrossOrigin
+    @GetMapping(path = "/deleteExpiredForm")
+    public ResponseEntity<String> deleteExpiredForm(){
+        Date date = new Date();
+        try{
+            applicationFormFacade.deleteExpiredForm(date);
+        }catch(Exception e){
+            return new ResponseEntity<>("Form details deletion failed", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        return new ResponseEntity<>("form detail deleted successfully!", HttpStatus.OK);
     }
 
 

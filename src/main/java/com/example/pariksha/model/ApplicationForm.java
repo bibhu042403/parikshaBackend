@@ -21,7 +21,6 @@ import java.util.Date;
 @DynamicUpdate
 @DynamicInsert
 public class ApplicationForm {
-
     @Id
     @Column(name = "id")
     private int id;

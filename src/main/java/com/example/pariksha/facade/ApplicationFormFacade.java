@@ -12,6 +12,8 @@ import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -87,6 +89,17 @@ public class ApplicationFormFacade {
         List<ApplicationForm> formDetails = applicationFormService.getAllLatestData(topData).get();
         return formDetails;
     }
+
+
+    public void deleteExpiredForm(Date date){
+        try {
+                applicationFormService.deleteExpiredForm(date);
+        }
+        catch(Exception e) {
+            System.out.println("Exception occur during deletion" + e);
+        }
+    }
+
 
 
 }

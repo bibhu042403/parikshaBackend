@@ -9,16 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.ws.rs.Produces;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
 /**
  * Created by Bibhu Bhushan on 09/12/2022
@@ -66,5 +64,20 @@ public class FileEncryptDecryptController {
                 response = "Error while decrypting";
         }
         return ResponseEntity.status(HttpStatus.OK).body(new com.example.pariksha.response.Response<>(response, response));
+    }
+
+    @PostMapping("/mergePdf")
+    public ResponseEntity<Response<String>> mergePdf(@RequestBody List<String> file){
+        String status = "";
+        try{
+            if(!file.isEmpty()){
+                fileService.mergePdf(file);
+                status = "Success";
+            }
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.OK).body(Response.error("Exception occurred while merging " + e));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(new Response<>(status, status));
     }
 }

@@ -33,9 +33,6 @@ public class ApplicationFormDataServiceImpl implements ApplicationFormDataServic
     ApplyDetailsRepository applyDetailsRepository;
 
     @Autowired
-    ExamDetailsRepository examDetailsRepository;
-
-    @Autowired
     QualificationDetailsRepository qualificationDetailsRepository;
 
     @Autowired

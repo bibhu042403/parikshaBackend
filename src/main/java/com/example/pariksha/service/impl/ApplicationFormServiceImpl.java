@@ -6,9 +6,11 @@ import com.example.pariksha.dto.EligibilityCheckRequestDto;
 import com.example.pariksha.dto.EligibilityResponseDto;
 import com.example.pariksha.service.ApplicationFormService;
 import com.example.pariksha.utlis.ParikshaUtils;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
+@Service
 public class ApplicationFormServiceImpl implements ApplicationFormService {
 
     @Override

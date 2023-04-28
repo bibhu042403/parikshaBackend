@@ -2,30 +2,34 @@ package com.example.pariksha.facade;
 
 
 import com.example.pariksha.dto.ApplicationFormDto;
-import com.example.pariksha.dto.ApplicationFormNewDto;
+import com.example.pariksha.dto.ApplicationFormDetailsDto;
+import com.example.pariksha.dto.EligibilityCheckRequestDto;
+import com.example.pariksha.dto.EligibilityResponseDto;
 import com.example.pariksha.model.ApplicationForm;
-import com.example.pariksha.model.ApplicationFormDate;
+import com.example.pariksha.service.ApplicationFormDataService;
 import com.example.pariksha.service.ApplicationFormService;
-import com.example.pariksha.utlis.ConvertionUtils;
 import com.google.gson.Gson;
-import com.sun.org.apache.xpath.internal.operations.Bool;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.ApplicationObjectSupport;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 
 @Component
 public class ApplicationFormFacade {
 
     @Autowired
+    ApplicationFormDataService applicationFormDataService;
+
+    @Autowired
     ApplicationFormService applicationFormService;
+    ModelMapper modelMapper = new ModelMapper();
 
     public ApplicationFormDto getFormDetails(String examName){
         ApplicationFormDto applicationFormDto = new ApplicationFormDto();
-        ApplicationForm applicationForm = applicationFormService.fetchUsingExamId(examName).get();
+        ApplicationForm applicationForm = applicationFormDataService.fetchUsingExamId(examName).get();
         if(applicationForm != null) {
            applicationFormDto = new Gson().fromJson(new Gson().toJson(applicationForm), ApplicationFormDto.class);
             return applicationFormDto;
@@ -34,39 +38,19 @@ public class ApplicationFormFacade {
     }
 
     public boolean saveApplicationForm(ApplicationFormDto applicationFormDto){
-        HashSet<Boolean> check = new HashSet<>();
         try {
-            if(applicationFormDto == null)
-                return false;
-            if (applicationFormDto.getApplicationFormDate() != null)
-                check.add(applicationFormService.saveApplicationFormDate(applicationFormDto.getApplicationFormDate()));
-            if(applicationFormDto.getApplicationFeeDetails() != null)
-                check.add(applicationFormService.saveApplicationFeeDetails(applicationFormDto.getApplicationFeeDetails()));
-            if(applicationFormDto.getApplicationAgeLimit() != null)
-                check.add(applicationFormService.saveApplicationAgeLimit(applicationFormDto.getApplicationAgeLimit()));
-            if(applicationFormDto.getQualificationDetails()!=null)
-                check.add(applicationFormService.saveQualificationDetails(applicationFormDto.getQualificationDetails()));
-            if(applicationFormDto.getVacancyCategoryWise() !=null)
-                check.add(applicationFormService.saveVacancyCategoryWise(applicationFormDto.getVacancyCategoryWise()));
-            if(applicationFormDto.getVacancyPostWise() !=null)
-                check.add(applicationFormService.saveVacancyPostWise(applicationFormDto.getVacancyPostWise()));
-            if(applicationFormDto.getApplyDetails() !=null)
-                check.add(applicationFormService.saveApplyDetails(applicationFormDto.getApplyDetails()));
-            if(applicationFormDto.getExamDetails() != null)
-                check.add(applicationFormService.saveExamDetails(applicationFormDto.getExamDetails()));
+            ApplicationForm applicationForm = modelMapper.map(applicationFormDto, ApplicationForm.class);
+            return applicationFormDataService.saveApplicationForm(applicationForm);
+        }catch(Exception e){
+            System.out.println("Exception occurred while saving");
         }
-        catch(Exception e){
-            System.out.println("Exception while saving" + e);
-        }
-        if(check.size()>1)
-            return false;
-        return true;
+       return false;
     }
 
     public boolean saveApplication(ApplicationForm applicationForm){
         try {
             if (applicationForm != null)
-                return applicationFormService.saveApplicationForm(applicationForm);
+                return applicationFormDataService.saveApplicationForm(applicationForm);
         }
         catch(Exception e){
             System.out.println("Exception occur during saving" + e);
@@ -74,32 +58,44 @@ public class ApplicationFormFacade {
         return false;
     }
 
-    public boolean saveApplicationForm(ApplicationFormNewDto applicationFormNewDto){
+    public boolean saveApplicationForm(ApplicationFormDetailsDto applicationFormDetailsDto){
                 return false;
     }
 
-    public List<ApplicationForm> getFiveLastData(){
-        int lastData = 5;
-        List<ApplicationForm> formDetails = applicationFormService.getAllLimited(lastData).get();
+    public List<ApplicationForm> getLastData(int formCount){
+        List<ApplicationForm> formDetails = applicationFormDataService.getAllLimited(formCount).get();
         return formDetails;
     }
 
-    public List<ApplicationForm> getFiveLatestData(){
-        int topData = 5;
-        List<ApplicationForm> formDetails = applicationFormService.getAllLatestData(topData).get();
+    public List<ApplicationForm> getLatestData(int formCount){
+        List<ApplicationForm> formDetails = applicationFormDataService.getAllLatestData(formCount).get();
         return formDetails;
     }
 
 
     public void deleteExpiredForm(Date date){
         try {
-                applicationFormService.deleteExpiredForm(date);
+                applicationFormDataService.deleteExpiredForm(date);
         }
         catch(Exception e) {
             System.out.println("Exception occur during deletion" + e);
         }
     }
 
-
+    /**
+     * Will check if user is eligible for this form or not
+     * @param eligibilityCheckRequestDto will have all basic detail
+     * @return age and fee details if user is eligible
+     */
+    public EligibilityResponseDto checkEligibility(EligibilityCheckRequestDto eligibilityCheckRequestDto){
+        EligibilityResponseDto eligibilityResponseDto = new EligibilityResponseDto();
+        ApplicationFormDto applicationFormDto = applicationFormDataService.getApplicationFormDtoForExamId(eligibilityCheckRequestDto.getExamId());
+        try{
+            eligibilityResponseDto = applicationFormService.checkEligibility(eligibilityCheckRequestDto,applicationFormDto);
+        }catch(Exception e){
+            System.out.println("Exception while checking eligibility");
+        }
+        return eligibilityResponseDto;
+    }
 
 }

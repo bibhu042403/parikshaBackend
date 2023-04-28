@@ -1,6 +1,7 @@
 package com.example.pariksha.controller;
 
 import com.example.pariksha.dto.ApplicationFormDto;
+import com.example.pariksha.dto.EligibilityCheckRequestDto;
 import com.example.pariksha.facade.ApplicationFormFacade;
 import com.example.pariksha.model.ApplicationForm;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,8 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -21,7 +20,7 @@ public class FormController {
 
     @CrossOrigin
     @PostMapping(path = "/saveForms")
-    public ResponseEntity<String> saveLead(@RequestBody ApplicationFormDto applicationFormDto){
+    public ResponseEntity<String> saveApplicationForm(@RequestBody ApplicationFormDto applicationFormDto){
         if(applicationFormFacade.saveApplicationForm(applicationFormDto)){
             return new ResponseEntity<>("lead saved", HttpStatus.OK);
         }
@@ -30,26 +29,16 @@ public class FormController {
     }
 
     @CrossOrigin
-    @PostMapping(path = "/saveFormsDetails")
-    public ResponseEntity<String> saveForms(@RequestBody ApplicationForm applicationForm){
-        if(applicationFormFacade.saveApplication(applicationForm)){
-            return new ResponseEntity<>("lead saved", HttpStatus.OK);
-        }
-        else
-            return new ResponseEntity<>("Lead failed to save", HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @CrossOrigin
-    @GetMapping(path = "/getFiveLastData")
-    public List<ApplicationForm> getFiveLastData(){
-        List<ApplicationForm> list = applicationFormFacade.getFiveLastData();
+    @GetMapping(path = "/getLastData")
+    public List<ApplicationForm> getLastData(@RequestBody int formCount){
+        List<ApplicationForm> list = applicationFormFacade.getLastData(formCount);
         return list;
     }
 
     @CrossOrigin
-    @GetMapping(path = "/getFiveLatestData")
-    public List<ApplicationForm> getFiveLatestData(){
-        List<ApplicationForm> list = applicationFormFacade.getFiveLastData();
+    @GetMapping(path = "/getLatestData")
+    public List<ApplicationForm> getLatestData(@RequestBody int formCount){
+        List<ApplicationForm> list = applicationFormFacade.getLatestData(formCount);
         return list;
     }
 
@@ -65,5 +54,15 @@ public class FormController {
         return new ResponseEntity<>("form detail deleted successfully!", HttpStatus.OK);
     }
 
+    @CrossOrigin
+    @GetMapping(path = "/checkEligibility")
+    public ResponseEntity<String> checkEligibility(@RequestBody EligibilityCheckRequestDto eligibilityCheckRequestDto){
+        try{
+
+        }catch(Exception e){
+            return new ResponseEntity<>("Form not found", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>("form found successfully!", HttpStatus.OK);
+    }
 
 }

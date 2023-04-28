@@ -19,4 +19,6 @@ public interface ApplicationFormRepository extends JpaRepository<ApplicationForm
     Page<ApplicationForm> findAll(Pageable pageable);
 
     void deleteByLastDateLessThan(Date date);
+
+    ApplicationForm findByExamId(String examId);
 }

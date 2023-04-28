@@ -1,215 +1,76 @@
 package com.example.pariksha.service.impl;
 
-import com.example.pariksha.dao.*;
-import com.example.pariksha.model.*;
+import com.example.pariksha.constants.ParikhshaConstant;
+import com.example.pariksha.dto.ApplicationFormDto;
+import com.example.pariksha.dto.EligibilityCheckRequestDto;
+import com.example.pariksha.dto.EligibilityResponseDto;
 import com.example.pariksha.service.ApplicationFormService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
+import com.example.pariksha.utlis.ParikshaUtils;
 
-import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 
-@Slf4j
-@Service
 public class ApplicationFormServiceImpl implements ApplicationFormService {
 
-    @Autowired
-    ApplicationFormRepository applicationFormRepository;
-
-    @Autowired
-    ApplicationAgeLimitRepository applicationAgeLimitRepository;
-
-    @Autowired
-    ApplicationFeeDetailsRepository applicationFeeDetailsRepository;
-
-    @Autowired
-    ApplyDetailsRepository applyDetailsRepository;
-
-    @Autowired
-    ExamDetailsRepository examDetailsRepository;
-
-    @Autowired
-    QualificationDetailsRepository qualificationDetailsRepository;
-
-    @Autowired
-    VacancyPostWiseRepository vacancyPostWiseRepository;
-
-    @Autowired
-    VacancyCategoryWiseRepository vacancyCategoryWiseRepository;
-
-    @Autowired
-    ApplicationFormDateRepository applicationFormDateRepository;
-
-
-
     @Override
-    public boolean saveLead(ApplicationForm applicationForm) {
-        try{
-            ApplicationForm saveApplicationForm = applicationFormRepository.save(applicationForm);
-            if(saveApplicationForm!= null){
+    public EligibilityResponseDto checkEligibility(EligibilityCheckRequestDto eligibilityCheckRequestDto, ApplicationFormDto applicationFormDto) {
+        EligibilityResponseDto eligibilityResponseDto = new EligibilityResponseDto();
+        if(eligibleByAge(eligibilityCheckRequestDto,applicationFormDto)){
+            int appFee = Math.min(feeBasedOnCategory(eligibilityCheckRequestDto, applicationFormDto), feeBasedOnGender(eligibilityCheckRequestDto, applicationFormDto));
+            eligibilityResponseDto.setApplicationFee(String.valueOf(appFee));
+            eligibilityResponseDto.setEligibility(true);
+            String lstDate = applicationFormDto.getLastDate().toString();
+            eligibilityResponseDto.setLastDate(lstDate);
+            return eligibilityResponseDto;
+        }
+        eligibilityResponseDto.setEligibility(false);
+        return eligibilityResponseDto;
+    }
+
+    public int feeBasedOnCategory(EligibilityCheckRequestDto eligibilityCheckRequestDto, ApplicationFormDto applicationFormDto){
+        if(eligibilityCheckRequestDto.getCategory().equals(ParikhshaConstant.ST))
+            return Integer.parseInt(applicationFormDto.getStScFee());
+        else if(eligibilityCheckRequestDto.getCategory().equals(ParikhshaConstant.GEN))
+            return Integer.parseInt(applicationFormDto.getGeneralFee());
+        else if(eligibilityCheckRequestDto.getCategory().equals(ParikhshaConstant.OBC))
+            return Integer.parseInt(applicationFormDto.getObcFee());
+        else if(eligibilityCheckRequestDto.getCategory().equals(ParikhshaConstant.SC))
+            return Integer.parseInt(applicationFormDto.getStScFee());
+        return 0;
+    }
+    public int feeBasedOnGender(EligibilityCheckRequestDto eligibilityCheckRequestDto, ApplicationFormDto applicationFormDto){
+        if(eligibilityCheckRequestDto.getGender().equals(ParikhshaConstant.MALE))
+            return Integer.parseInt(applicationFormDto.getGeneralFee());
+        else if(eligibilityCheckRequestDto.getGender().equals(ParikhshaConstant.FEMALE))
+            return Integer.parseInt(applicationFormDto.getFemaleFee());
+        else if(eligibilityCheckRequestDto.getGender().equals(ParikhshaConstant.TRANS))
+            return Integer.parseInt(applicationFormDto.getFemaleFee());
+        return 0;
+    }
+
+    public boolean eligibleByAge(EligibilityCheckRequestDto eligibilityCheckRequestDto, ApplicationFormDto applicationFormDto){
+        String dob = eligibilityCheckRequestDto.getDob();
+        try {
+            int age = ParikshaUtils.calculateAge(dob);
+            if (eligibilityCheckRequestDto.getCategory().equals(ParikhshaConstant.ST) && age < Integer.parseInt(applicationFormDto.getStScAge()))
+                return true;
+            else if (eligibilityCheckRequestDto.getCategory().equals(ParikhshaConstant.SC) && age < Integer.parseInt(applicationFormDto.getStScAge())) {
+                return true;
+            } else if (eligibilityCheckRequestDto.getCategory().equals(ParikhshaConstant.OBC) && age< Integer.parseInt(applicationFormDto.getObcAge())) {
+                return true;
+            } else if (eligibilityCheckRequestDto.getCategory().equals(ParikhshaConstant.GEN) && age<Integer.parseInt(applicationFormDto.getGeneralAge())) {
+                return true;
+            } else if (eligibilityCheckRequestDto.getGender().equals(ParikhshaConstant.FEMALE) && age<Integer.parseInt(applicationFormDto.getFemaleAge())) {
+                return true;
+            } else if (eligibilityCheckRequestDto.getGender().equals(ParikhshaConstant.EX_SERVICE) && age<Integer.parseInt(applicationFormDto.getExServiceMenAge())) {
                 return true;
             }
-            else {
-                return false;
+            else if (eligibilityCheckRequestDto.getGender().equals(ParikhshaConstant.PWD) && age<Integer.parseInt(applicationFormDto.getPwdObcFee())) {
+                return true;
             }
-        }
-        catch(Exception e){
-            log.info("Exception while saving ");
-        }
-        return false;
-    }
-
-    @Override
-    public List<UserDetails> getFormDetails(String examName) {
-
-        return null;
-    }
-
-    @Override
-    public Optional<ApplicationForm> fetchUsingExamId(String examName) {
-
-        return applicationFormRepository.findApplicationFormByExamId(examName);
-    }
-
-    @Override
-    public boolean saveApplicationFormDate(ApplicationFormDate applicationFormDate) {
-        try{
-            ApplicationFormDate saveApplicationFormDate = applicationFormDateRepository.save(applicationFormDate);
-            return saveApplicationFormDate != null;
-        }
-        catch(Exception e){
-            log.info("Exception while saving ");
+    }catch(Exception e){
+            System.out.println("Exception while parsing DOB");
         }
         return false;
     }
 
-    @Override
-    public boolean saveApplicationFeeDetails(ApplicationFeeDetails applicationFeeDetails) {
-        try{
-            ApplicationFeeDetails saveApplicationFeeDetails = applicationFeeDetailsRepository.save(applicationFeeDetails);
-            return saveApplicationFeeDetails != null;
-        }
-        catch(Exception e){
-            log.info("Exception while saving ");
-        }
-        return false;
-    }
-
-    @Override
-    public boolean saveApplicationAgeLimit(ApplicationAgeLimit applicationAgeLimit) {
-        try{
-            ApplicationAgeLimit saveApplicationAgeLimit = applicationAgeLimitRepository.save(applicationAgeLimit);
-            return saveApplicationAgeLimit != null;
-        }
-        catch(Exception e){
-        log.info("Exception while saving ");
-        }
-        return false;
-}
-
-    @Override
-    public boolean saveApplyDetails(ApplyDetails applyDetails) {
-        try{
-            ApplyDetails saveApplyDetails = applyDetailsRepository.save(applyDetails);
-            return saveApplyDetails != null;
-        }
-        catch(Exception e){
-        log.info("Exception while saving ");
-        }
-        return false;
-    }
-
-    @Override
-    public boolean saveExamDetails(ExamDetails examDetails) {
-        try{
-            ExamDetails saveExamDetails = examDetailsRepository.save(examDetails);
-            return saveExamDetails != null;
-        }
-        catch(Exception e){
-        log.info("Exception while saving ");
-        }
-        return false;
-    }
-
-    @Override
-    public boolean saveQualificationDetails(QualificationDetails qualificationDetails) {
-        try{
-            QualificationDetails saveQualificationDetails = qualificationDetailsRepository.save(qualificationDetails);
-            return saveQualificationDetails != null;
-        }
-        catch(Exception e){
-        log.info("Exception while saving ");
-        }
-        return false;
-    }
-
-    @Override
-    public boolean saveVacancyCategoryWise(VacancyCategoryWise vacancyCategoryWise) {
-        try{
-            VacancyCategoryWise saveVacancyCategoryWise = vacancyCategoryWiseRepository.save(vacancyCategoryWise);
-            return saveVacancyCategoryWise != null;
-        }
-        catch(Exception e){
-        log.info("Exception while saving ");
-        }
-        return false;
-
-    }
-
-    @Override
-    public boolean saveVacancyPostWise(VacancyPostWise vacancyPostWise){
-        try{
-            VacancyPostWise saveVacancyPostWise = vacancyPostWiseRepository.save(vacancyPostWise);
-            return saveVacancyPostWise != null;
-        }
-        catch(Exception e){
-            log.info("Exception while saving ");
-        }
-        return false;
-        }
-
-    @Override
-    public boolean saveApplicationForm(ApplicationForm applicationForm) {
-        try{
-            ApplicationForm saveApplicationForm = applicationFormRepository.save(applicationForm);
-            return saveApplicationForm != null;
-        }
-        catch(Exception e){
-            log.info("Exception while saving ");
-        }
-        return false;
-    }
-
-    @Override
-    public List<ApplicationForm> getLastFiveApplication(Date date) {
-        return null;
-    }
-
-    @Override
-    public Optional<List<ApplicationForm>> getAllLimited(int LIMIT) {
-        Page<ApplicationForm> page = applicationFormRepository.findAll(PageRequest.of(0,LIMIT, Sort.by(Sort.Order.asc("lastDate"))));
-        return Optional.of(page.getContent());
-    }
-
-    @Override
-    public Optional<List<ApplicationForm>> getAllLatestData(int LIMIT) {
-        Page<ApplicationForm> page = applicationFormRepository.findAll(PageRequest.of(0,LIMIT, Sort.by(Sort.Order.asc("dateCreated"))));
-        return Optional.of(page.getContent());
-    }
-
-    @Override
-    public void deleteExpiredForm(Date date) {
-        try{
-            applicationFormRepository.deleteByLastDateLessThan(date);
-        }
-        catch(Exception e){
-            System.out.println("Exception occurred while deleting");
-        }
-    }
 }

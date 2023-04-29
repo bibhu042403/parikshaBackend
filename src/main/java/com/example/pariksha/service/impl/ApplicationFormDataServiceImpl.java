@@ -2,6 +2,7 @@ package com.example.pariksha.service.impl;
 
 import com.example.pariksha.dao.*;
 import com.example.pariksha.dto.ApplicationFormDto;
+import com.example.pariksha.dto.VacancyCategoryWiseDto;
 import com.example.pariksha.model.*;
 import com.example.pariksha.service.ApplicationFormDataService;
 import lombok.extern.slf4j.Slf4j;
@@ -172,6 +173,18 @@ public class ApplicationFormDataServiceImpl implements ApplicationFormDataServic
         return false;
     }
 
+//    @Override
+//    public boolean saveVacancyDetails(VacancyCategoryWise vacancyCategoryWise) {
+//        try{
+//            ApplicationForm saveApplicationForm = vacancyCategoryWiseRepository.save(vacancyCategoryWise);
+//            return saveApplicationForm != null;
+//        }
+//        catch(Exception e){
+//            log.info("Exception while saving ");
+//        }
+//        return false;
+//    }
+
     @Override
     public List<ApplicationForm> getLastFiveApplication(Date date) {
         return null;
@@ -204,5 +217,12 @@ public class ApplicationFormDataServiceImpl implements ApplicationFormDataServic
         ApplicationForm applicationForm = applicationFormRepository.findByExamId(examId);
         ApplicationFormDto applicationFormDto = modelMapper.map(applicationForm, ApplicationFormDto.class);
         return applicationFormDto;
+    }
+
+    @Override
+    public VacancyCategoryWiseDto getVacancyDetailsForExamId(String examId) {
+        VacancyCategoryWise vacancyCategoryWise = vacancyCategoryWiseRepository.findByExamId(examId);
+        VacancyCategoryWiseDto vacancyCategoryWiseDto = modelMapper.map(vacancyCategoryWise, VacancyCategoryWiseDto.class);
+        return vacancyCategoryWiseDto;
     }
 }

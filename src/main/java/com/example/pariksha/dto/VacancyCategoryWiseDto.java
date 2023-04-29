@@ -1,8 +1,13 @@
 package com.example.pariksha.dto;
 
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.Date;
 
+@Data
+@NoArgsConstructor
 public class VacancyCategoryWiseDto {
     private int id;
     private String examId;

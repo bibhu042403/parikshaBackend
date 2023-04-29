@@ -1,5 +1,6 @@
 package com.example.pariksha.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,5 +11,6 @@ public class EligibilityCheckRequestDto {
     String category;
     String gender;
     String ex_emp;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     String Dob;
 }

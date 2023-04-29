@@ -1,11 +1,9 @@
 package com.example.pariksha.facade;
 
 
-import com.example.pariksha.dto.ApplicationFormDto;
-import com.example.pariksha.dto.ApplicationFormDetailsDto;
-import com.example.pariksha.dto.EligibilityCheckRequestDto;
-import com.example.pariksha.dto.EligibilityResponseDto;
+import com.example.pariksha.dto.*;
 import com.example.pariksha.model.ApplicationForm;
+import com.example.pariksha.model.VacancyCategoryWise;
 import com.example.pariksha.service.ApplicationFormDataService;
 import com.example.pariksha.service.ApplicationFormService;
 import com.google.gson.Gson;
@@ -98,4 +96,13 @@ public class ApplicationFormFacade {
         return eligibilityResponseDto;
     }
 
+    public boolean saveVacancyDetails(VacancyCategoryWiseDto vacancyCategoryWiseDto){
+        try {
+            VacancyCategoryWise vacancyCategoryWise = modelMapper.map(vacancyCategoryWiseDto, VacancyCategoryWise.class);
+            return applicationFormDataService.saveVacancyCategoryWise(vacancyCategoryWise);
+        }catch(Exception e){
+            System.out.println("Exception occurred while saving");
+        }
+        return false;
+    }
 }

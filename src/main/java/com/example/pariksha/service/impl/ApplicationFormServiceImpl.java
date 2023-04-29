@@ -4,12 +4,20 @@ import com.example.pariksha.constants.ParikhshaConstant;
 import com.example.pariksha.dto.ApplicationFormDto;
 import com.example.pariksha.dto.EligibilityCheckRequestDto;
 import com.example.pariksha.dto.EligibilityResponseDto;
+import com.example.pariksha.dto.VacancyCategoryWiseDto;
+import com.example.pariksha.service.ApplicationFormDataService;
 import com.example.pariksha.service.ApplicationFormService;
 import com.example.pariksha.utlis.ParikshaUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
+@Service
 public class ApplicationFormServiceImpl implements ApplicationFormService {
+
+    @Autowired
+    ApplicationFormDataService applicationFormDataService;
 
     @Override
     public EligibilityResponseDto checkEligibility(EligibilityCheckRequestDto eligibilityCheckRequestDto, ApplicationFormDto applicationFormDto) {
@@ -20,6 +28,7 @@ public class ApplicationFormServiceImpl implements ApplicationFormService {
             eligibilityResponseDto.setEligibility(true);
             String lstDate = applicationFormDto.getLastDate().toString();
             eligibilityResponseDto.setLastDate(lstDate);
+            eligibilityResponseDto.setVacancy(String.valueOf(getVacancy(eligibilityCheckRequestDto)));
             return eligibilityResponseDto;
         }
         eligibilityResponseDto.setEligibility(false);
@@ -71,6 +80,23 @@ public class ApplicationFormServiceImpl implements ApplicationFormService {
             System.out.println("Exception while parsing DOB");
         }
         return false;
+    }
+
+    public int getVacancy(EligibilityCheckRequestDto eligibilityCheckRequestDto){
+        VacancyCategoryWiseDto vacancyCategoryWiseDto = applicationFormDataService.getVacancyDetailsForExamId(eligibilityCheckRequestDto.getExamId());
+         if(eligibilityCheckRequestDto.getCategory().equals(ParikhshaConstant.GEN)) {
+             return vacancyCategoryWiseDto.getGeneral();
+         }
+         else if (eligibilityCheckRequestDto.getCategory().equals(ParikhshaConstant.OBC)) {
+             return vacancyCategoryWiseDto.getObc();
+         } else if (eligibilityCheckRequestDto.getCategory().equals(ParikhshaConstant.ST)) {
+             return vacancyCategoryWiseDto.getSt();
+         } else if (eligibilityCheckRequestDto.getCategory().equals(ParikhshaConstant.SC)) {
+             return vacancyCategoryWiseDto.getSc();
+         } else if (eligibilityCheckRequestDto.getCategory().equals(ParikhshaConstant.FEMALE)) {
+             return vacancyCategoryWiseDto.getObcFemale();
+         }
+        return 0;
     }
 
 }

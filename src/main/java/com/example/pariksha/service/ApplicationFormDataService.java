@@ -1,6 +1,7 @@
 package com.example.pariksha.service;
 
 import com.example.pariksha.dto.ApplicationFormDto;
+import com.example.pariksha.dto.VacancyCategoryWiseDto;
 import com.example.pariksha.model.*;
 
 import java.util.Date;
@@ -30,6 +31,7 @@ public interface ApplicationFormDataService {
 
     boolean saveApplicationForm(ApplicationForm applicationForm);
 
+
     List<ApplicationForm> getLastFiveApplication(Date date);
 
     Optional<List<ApplicationForm>> getAllLimited(int LIMIT);
@@ -39,4 +41,6 @@ public interface ApplicationFormDataService {
     void deleteExpiredForm(Date date);
 
     ApplicationFormDto getApplicationFormDtoForExamId(String examId);
+
+    VacancyCategoryWiseDto getVacancyDetailsForExamId(String examId);
 }

@@ -32,28 +32,28 @@ public class VacancyCategoryWise {
     private String examId;
 
     @Column(name = "general")
-    private int general;
+    private String general;
 
     @Column(name = "obc")
-    private int obc;
+    private String obc;
 
     @Column(name = "e_obc")
-    private int eObc;
+    private String eObc;
 
     @Column(name = "obc_female")
-    private int obcFemale;
+    private String obcFemale;
 
     @Column(name = "ews")
-    private int ews;
+    private String ews;
 
     @Column(name = "sc")
-    private int sc;
+    private String sc;
 
     @Column(name = "st")
-    private int st;
+    private String st;
 
     @Column(name = "total")
-    private int total;
+    private String total;
     @Column(name = "date_created")
     String dateCreated;
 

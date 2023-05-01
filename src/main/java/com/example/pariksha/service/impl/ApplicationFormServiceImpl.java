@@ -28,7 +28,7 @@ public class ApplicationFormServiceImpl implements ApplicationFormService {
             eligibilityResponseDto.setEligibility(true);
             String lstDate = applicationFormDto.getLastDate().toString();
             eligibilityResponseDto.setLastDate(lstDate);
-            eligibilityResponseDto.setVacancy(String.valueOf(getVacancy(eligibilityCheckRequestDto)));
+            eligibilityResponseDto.setVacancy(getVacancy(eligibilityCheckRequestDto));
             return eligibilityResponseDto;
         }
         eligibilityResponseDto.setEligibility(false);
@@ -82,21 +82,29 @@ public class ApplicationFormServiceImpl implements ApplicationFormService {
         return false;
     }
 
-    public int getVacancy(EligibilityCheckRequestDto eligibilityCheckRequestDto){
-        VacancyCategoryWiseDto vacancyCategoryWiseDto = applicationFormDataService.getVacancyDetailsForExamId(eligibilityCheckRequestDto.getExamId());
-         if(eligibilityCheckRequestDto.getCategory().equals(ParikhshaConstant.GEN)) {
-             return vacancyCategoryWiseDto.getGeneral();
-         }
-         else if (eligibilityCheckRequestDto.getCategory().equals(ParikhshaConstant.OBC)) {
-             return vacancyCategoryWiseDto.getObc();
-         } else if (eligibilityCheckRequestDto.getCategory().equals(ParikhshaConstant.ST)) {
-             return vacancyCategoryWiseDto.getSt();
-         } else if (eligibilityCheckRequestDto.getCategory().equals(ParikhshaConstant.SC)) {
-             return vacancyCategoryWiseDto.getSc();
-         } else if (eligibilityCheckRequestDto.getCategory().equals(ParikhshaConstant.FEMALE)) {
-             return vacancyCategoryWiseDto.getObcFemale();
-         }
-        return 0;
+    public String getVacancy(EligibilityCheckRequestDto eligibilityCheckRequestDto){
+        VacancyCategoryWiseDto vacancyCategoryWiseDto;
+        String respose="";
+        try {
+            vacancyCategoryWiseDto = applicationFormDataService.getVacancyDetailsForExamId(eligibilityCheckRequestDto.getExamId());
+            if (eligibilityCheckRequestDto.getCategory().equals(ParikhshaConstant.GEN)) {
+                return vacancyCategoryWiseDto.getGeneral();
+            } else if (eligibilityCheckRequestDto.getCategory().equals(ParikhshaConstant.OBC)) {
+                return vacancyCategoryWiseDto.getObc();
+            } else if (eligibilityCheckRequestDto.getCategory().equals(ParikhshaConstant.ST)) {
+                return vacancyCategoryWiseDto.getSt();
+            } else if (eligibilityCheckRequestDto.getCategory().equals(ParikhshaConstant.SC)) {
+                return vacancyCategoryWiseDto.getSc();
+            } else if (eligibilityCheckRequestDto.getCategory().equals(ParikhshaConstant.FEMALE)) {
+                return vacancyCategoryWiseDto.getObcFemale();
+            }
+            respose = "No Record Found";
+        }
+         catch(Exception e){
+             System.out.println("Exception occurred while fetching vacancy details");
+             respose = "No Record Found";
+            }
+        return respose;
     }
 
 }

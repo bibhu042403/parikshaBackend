@@ -1,26 +1,29 @@
 package com.example.pariksha.service.impl;
 
 import com.example.pariksha.constants.ParikhshaConstant;
-import com.example.pariksha.dto.ApplicationFormDto;
+import com.example.pariksha.dto.ApplicationFormDTO;
 import com.example.pariksha.dto.EligibilityCheckRequestDto;
 import com.example.pariksha.dto.EligibilityResponseDto;
 import com.example.pariksha.dto.VacancyCategoryWiseDto;
+import com.example.pariksha.model.ApplicationForm;
 import com.example.pariksha.service.ApplicationFormDataService;
 import com.example.pariksha.service.ApplicationFormService;
 import com.example.pariksha.utlis.ParikshaUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class ApplicationFormServiceImpl implements ApplicationFormService {
 
     @Autowired
     ApplicationFormDataService applicationFormDataService;
-
+    private ModelMapper modelMapper = new ModelMapper();
     @Override
-    public EligibilityResponseDto checkEligibility(EligibilityCheckRequestDto eligibilityCheckRequestDto, ApplicationFormDto applicationFormDto) {
+    public EligibilityResponseDto checkEligibility(EligibilityCheckRequestDto eligibilityCheckRequestDto, ApplicationFormDTO applicationFormDto) {
         EligibilityResponseDto eligibilityResponseDto = new EligibilityResponseDto();
         if(eligibleByAge(eligibilityCheckRequestDto,applicationFormDto)){
             int appFee = Math.min(feeBasedOnCategory(eligibilityCheckRequestDto, applicationFormDto), feeBasedOnGender(eligibilityCheckRequestDto, applicationFormDto));
@@ -35,7 +38,22 @@ public class ApplicationFormServiceImpl implements ApplicationFormService {
         return eligibilityResponseDto;
     }
 
-    public int feeBasedOnCategory(EligibilityCheckRequestDto eligibilityCheckRequestDto, ApplicationFormDto applicationFormDto){
+    @Override
+    public List<ApplicationFormDTO> getAllAppData() {
+        List<ApplicationForm> allAppDataList = applicationFormDataService.getAllFormData();
+        return convertInToApplicationFormDTO(allAppDataList);
+    }
+
+    public List<ApplicationFormDTO> convertInToApplicationFormDTO(List<ApplicationForm> allAppDataList){
+        List<ApplicationFormDTO> dtos = new ArrayList<>();
+        for (ApplicationForm entity : allAppDataList) {
+          ApplicationFormDTO applicationFormDTO = modelMapper.map(entity, ApplicationFormDTO.class);
+            dtos.add(applicationFormDTO);
+        }
+        return dtos;
+    }
+
+    public int feeBasedOnCategory(EligibilityCheckRequestDto eligibilityCheckRequestDto, ApplicationFormDTO applicationFormDto){
         if(eligibilityCheckRequestDto.getCategory().equals(ParikhshaConstant.ST))
             return Integer.parseInt(applicationFormDto.getStScFee());
         else if(eligibilityCheckRequestDto.getCategory().equals(ParikhshaConstant.GEN))
@@ -46,7 +64,7 @@ public class ApplicationFormServiceImpl implements ApplicationFormService {
             return Integer.parseInt(applicationFormDto.getStScFee());
         return 0;
     }
-    public int feeBasedOnGender(EligibilityCheckRequestDto eligibilityCheckRequestDto, ApplicationFormDto applicationFormDto){
+    public int feeBasedOnGender(EligibilityCheckRequestDto eligibilityCheckRequestDto, ApplicationFormDTO applicationFormDto){
         if(eligibilityCheckRequestDto.getGender().equals(ParikhshaConstant.MALE))
             return Integer.parseInt(applicationFormDto.getGeneralFee());
         else if(eligibilityCheckRequestDto.getGender().equals(ParikhshaConstant.FEMALE))
@@ -56,7 +74,7 @@ public class ApplicationFormServiceImpl implements ApplicationFormService {
         return 0;
     }
 
-    public boolean eligibleByAge(EligibilityCheckRequestDto eligibilityCheckRequestDto, ApplicationFormDto applicationFormDto){
+    public boolean eligibleByAge(EligibilityCheckRequestDto eligibilityCheckRequestDto, ApplicationFormDTO applicationFormDto){
         String dob = eligibilityCheckRequestDto.getDob();
         try {
             int age = ParikshaUtils.calculateAge(dob);

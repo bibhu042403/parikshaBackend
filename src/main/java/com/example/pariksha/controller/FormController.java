@@ -1,17 +1,18 @@
 package com.example.pariksha.controller;
 
-import com.example.pariksha.dto.ApplicationFormDto;
+import com.example.pariksha.dto.ApplicationFormDTO;
 import com.example.pariksha.dto.EligibilityCheckRequestDto;
 import com.example.pariksha.dto.EligibilityResponseDto;
 import com.example.pariksha.dto.VacancyCategoryWiseDto;
 import com.example.pariksha.facade.ApplicationFormFacade;
 import com.example.pariksha.model.ApplicationForm;
-import com.example.pariksha.model.VacancyCategoryWise;
 import com.example.pariksha.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.Date;
 import java.util.List;
@@ -24,7 +25,7 @@ public class FormController {
 
     @CrossOrigin
     @PostMapping(path = "/saveForms")
-    public ResponseEntity<String> saveApplicationForm(@RequestBody ApplicationFormDto applicationFormDto){
+    public ResponseEntity<String> saveApplicationForm(@RequestBody ApplicationFormDTO applicationFormDto){
         if(applicationFormFacade.saveApplicationForm(applicationFormDto)){
             return new ResponseEntity<>("lead saved", HttpStatus.OK);
         }
@@ -32,8 +33,24 @@ public class FormController {
             return new ResponseEntity<>("Lead failed to save", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+//    @CrossOrigin
+//    @GetMapping(path = "/getAllData", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public Page<ApplicationForm> getApplicationForms(
+//            @RequestParam("page") int page,
+//            @RequestParam("pageSize") int pageSize
+//    )  {
+//        int offset = (page - 1) * pageSize;
+//        List<ApplicationForm> list = applicationFormFacade.getDataSubset(offset, pageSize);
+//        return list;
+//    }
+
     @CrossOrigin
-    @GetMapping(path = "/getLastData")
+    @GetMapping(path = "/getAllData", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<ApplicationFormDTO> getAllData(){
+        return applicationFormFacade.getAllData();
+    }
+    @CrossOrigin
+    @GetMapping(path = "/getLastData", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ApplicationForm> getLastData(@RequestParam int formCount){
         List<ApplicationForm> list = applicationFormFacade.getLastData(formCount);
         return list;
@@ -42,8 +59,7 @@ public class FormController {
     @CrossOrigin
     @GetMapping(path = "/getLatestData")
     public List<ApplicationForm> getLatestData(@RequestParam int formCount){
-        List<ApplicationForm> list = applicationFormFacade.getLatestData(formCount);
-        return list;
+        return applicationFormFacade.getLatestData(formCount);
     }
 
     @CrossOrigin

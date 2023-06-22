@@ -2,6 +2,7 @@ package com.example.pariksha.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -11,15 +12,11 @@ import java.util.Date;
 @Entity
 @Table(name = "form_details")
 @Data
-@Getter
-@Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@DynamicUpdate
-@DynamicInsert
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ApplicationForm {
     @Id
     @Column(name = "id")
@@ -27,6 +24,8 @@ public class ApplicationForm {
     @Column(name = "exam_id")
     private String examId;
 
+    @Column(name = "exam_name")
+    private String examName;
     // age limit
     @Column(name = "general_age")
     private String generalAge;

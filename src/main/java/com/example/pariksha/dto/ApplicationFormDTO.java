@@ -8,9 +8,10 @@ import java.util.Date;
 
 @Data
 @NoArgsConstructor
-public class ApplicationFormDto {
+public class ApplicationFormDTO {
     private int id;
     private String examId;
+    private String examName;
 
     // age limit
     private String femaleAge;

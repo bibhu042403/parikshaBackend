@@ -9,7 +9,6 @@ import com.example.pariksha.service.ApplicationFormService;
 import com.google.gson.Gson;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.ApplicationObjectSupport;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -25,17 +24,17 @@ public class ApplicationFormFacade {
     ApplicationFormService applicationFormService;
     ModelMapper modelMapper = new ModelMapper();
 
-    public ApplicationFormDto getFormDetails(String examName){
-        ApplicationFormDto applicationFormDto = new ApplicationFormDto();
+    public ApplicationFormDTO getFormDetails(String examName){
+        ApplicationFormDTO applicationFormDto = new ApplicationFormDTO();
         ApplicationForm applicationForm = applicationFormDataService.fetchUsingExamId(examName).get();
         if(applicationForm != null) {
-           applicationFormDto = new Gson().fromJson(new Gson().toJson(applicationForm), ApplicationFormDto.class);
+           applicationFormDto = new Gson().fromJson(new Gson().toJson(applicationForm), ApplicationFormDTO.class);
             return applicationFormDto;
         }
         return null;
     }
 
-    public boolean saveApplicationForm(ApplicationFormDto applicationFormDto){
+    public boolean saveApplicationForm(ApplicationFormDTO applicationFormDto){
         try {
             ApplicationForm applicationForm = modelMapper.map(applicationFormDto, ApplicationForm.class);
             return applicationFormDataService.saveApplicationForm(applicationForm);
@@ -60,14 +59,15 @@ public class ApplicationFormFacade {
                 return false;
     }
 
+    public List<ApplicationFormDTO> getAllData(){
+        return applicationFormService.getAllAppData();
+    }
     public List<ApplicationForm> getLastData(int formCount){
-        List<ApplicationForm> formDetails = applicationFormDataService.getAllLimited(formCount).get();
-        return formDetails;
+        return applicationFormDataService.getAllLimited(formCount).get();
     }
 
     public List<ApplicationForm> getLatestData(int formCount){
-        List<ApplicationForm> formDetails = applicationFormDataService.getAllLatestData(formCount).get();
-        return formDetails;
+        return applicationFormDataService.getAllLatestData(formCount).get();
     }
 
 
@@ -87,7 +87,7 @@ public class ApplicationFormFacade {
      */
     public EligibilityResponseDto checkEligibility(EligibilityCheckRequestDto eligibilityCheckRequestDto){
         EligibilityResponseDto eligibilityResponseDto = new EligibilityResponseDto();
-        ApplicationFormDto applicationFormDto = applicationFormDataService.getApplicationFormDtoForExamId(eligibilityCheckRequestDto.getExamId());
+        ApplicationFormDTO applicationFormDto = applicationFormDataService.getApplicationFormDtoForExamId(eligibilityCheckRequestDto.getExamId());
         try{
             eligibilityResponseDto = applicationFormService.checkEligibility(eligibilityCheckRequestDto,applicationFormDto);
         }catch(Exception e){

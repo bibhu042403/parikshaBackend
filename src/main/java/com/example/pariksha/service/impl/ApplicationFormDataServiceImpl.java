@@ -1,7 +1,7 @@
 package com.example.pariksha.service.impl;
 
 import com.example.pariksha.dao.*;
-import com.example.pariksha.dto.ApplicationFormDto;
+import com.example.pariksha.dto.ApplicationFormDTO;
 import com.example.pariksha.dto.VacancyCategoryWiseDto;
 import com.example.pariksha.model.*;
 import com.example.pariksha.service.ApplicationFormDataService;
@@ -197,6 +197,11 @@ public class ApplicationFormDataServiceImpl implements ApplicationFormDataServic
     }
 
     @Override
+    public List<ApplicationForm> getAllFormData() {
+        return applicationFormRepository.findAllByOrderByDateCreatedDesc();
+    }
+
+    @Override
     public Optional<List<ApplicationForm>> getAllLatestData(int LIMIT) {
         Page<ApplicationForm> page = applicationFormRepository.findAll(PageRequest.of(0,LIMIT, Sort.by(Sort.Order.asc("dateCreated"))));
         return Optional.of(page.getContent());
@@ -213,9 +218,9 @@ public class ApplicationFormDataServiceImpl implements ApplicationFormDataServic
     }
 
     @Override
-    public ApplicationFormDto getApplicationFormDtoForExamId(String examId) {
+    public ApplicationFormDTO getApplicationFormDtoForExamId(String examId) {
         ApplicationForm applicationForm = applicationFormRepository.findByExamId(examId);
-        ApplicationFormDto applicationFormDto = modelMapper.map(applicationForm, ApplicationFormDto.class);
+        ApplicationFormDTO applicationFormDto = modelMapper.map(applicationForm, ApplicationFormDTO.class);
         return applicationFormDto;
     }
 
